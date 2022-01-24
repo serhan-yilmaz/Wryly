@@ -18,30 +18,63 @@ library(shinythemes)
 library(shinyBS) 
 library(shinyhelper)
 
+### CURRENT LANGUAGE SPECIFIER 
 
-#light <- bs_theme()
-#dark <- bs_theme(bg = "black", fg = "white", primary = "purple")
+CURRENT_LANGUAGE = "TR"
+#CURRENT_LANGUAGE = "EN"
 
-#keyboard <- generateVirtualKeyboard("")
+##############################
 
-words_all <- read.csv("wordsalpha5.txt", header=F);
-words_common <- read.csv("wordscommon5.txt", header=F);
+options(encoding="UTF-8")
 
+is_language_tr = CURRENT_LANGUAGE == "TR"
+is_language_en = CURRENT_LANGUAGE == "EN"
+
+words_all <- NULL
+words_common <- NULL
+ls <- NULL
+if(is_language_en){
+  Sys.setlocale(category = "LC_ALL", locale = "English")
+  words_all <- read.csv("wordsalpha5.txt", header=F);
+  words_common <- read.csv("wordscommon5.txt", header=F);
+  source("language_set_en.R");
+  ls <- language_set_en()
+} else {
+  Sys.setlocale(category = "LC_ALL", locale = "Turkish")
+  words_all <- read.csv("words_all_tr.txt", header=F);
+  words_common <- read.csv("words_common_tr.txt", header=F);
+  source("language_set_tr.R");
+  ls <- language_set_tr()
+}
+
+message(ls$MainTabHowToPlay)
+
+#words_all <- read.csv("wordsalpha5.txt", header=F);
+#words_common <- read.csv("wordscommon5.txt", header=F);
 
 controlButtonStyle = "margin-left: 1px; margin-right: 1px;"
+
+foList <- function(...){
+  x <- list(...)
+  outList <- list()
+  previous = NULL
+  for(i in seq(1, length(x), 1)){
+    if((i %% 2) == 0){
+      outList[[previous]] <- x[[i]]
+    }
+    previous = x[[i]]
+  }
+  return(outList)
+}
+
+
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
     useToastr(),
     useShinyjs(),
     theme = shinytheme("cerulean"),
-    #theme = light, 
-    #includeCSS("www/darkly.css"),
-    #uiOutput("theme_css"),
-    #theme = shinytheme("slate"),
-  #  theme = shinytheme("cerulean"),
     tags$style(type='text/css', ".container-fluid { padding: 14px; padding-right: 15px; min-height: 0;}"),
-   # activateVirtualKeyboard(keyboard),
     
     tags$script(HTML("$(function(){ 
       $(document).keyup(function(e) {
@@ -145,10 +178,13 @@ ui <- fluidPage(
   ),
   
     # Application title
-    titlePanel("Wordplay, but Wryly!", "Wryly"),
+   #titlePanel("Wordplay, but Wryly!", "Wryly"),
+   #titlePanel("Wordplay, ama Türkçe!", "Wryly"),
+   titlePanel(ls$TitleText, ls$TitleBrowser),
 
     tabsetPanel(
-        tabPanel("Game",
+        id = "main_tabset_panel", 
+        tabPanel(ls$MainTabGame,
                  #style = "padding-left: 4px;", 
     
     # Sidebar with a slider input for number of bins 
@@ -166,37 +202,33 @@ ui <- fluidPage(
             fluidRow(
                 tags$div(
                     style = "padding: 4px; margin-left: 11px; margin-top: 0px; padding-top: 0px;", 
-                    actionButton("buttonRestartRandomize", "Restart & Update Word")
+                    actionButton("buttonRestartRandomize", ls$RestartUpdateButtonLabel)
                     #,textInput("text","Write something:"),
                     #,actionButton("buttonReveal", "Reveal")
                     ), 
             )
         )
     )
-    
         ),
-        tabPanel("How to Play?", 
-                 tags$h3("How to Play?", style="font-weight:normal;"),
-                 tags$p(style="text-align:justify; margin-bottom: 8px", "There is a hidden 5-letter word, the aim is to find it!"), 
-                 tags$p(style="text-align:justify; margin-bottom: 8px", "A total of 6 guesses are allowed. Each guess has to be a meaningful 5-letter english word."),
-                 tags$p(style="text-align:justify; margin-bottom: 8px;", "After each guess, a clue is provided based on the coloring of the letters: "), 
+        tabPanel(ls$MainTabHowToPlay, 
+                 tags$h3(ls$MainTabHowToPlay, style="font-weight:normal;"),
+                 tags$p(style="text-align:justify; margin-bottom: 8px", ls$HowtoplayAim), 
+                 tags$p(style="text-align:justify; margin-bottom: 8px", ls$HowtoplayGuesses),
+                 tags$p(style="text-align:justify; margin-bottom: 8px;",ls$HowtoplayClues), 
                  tags$p(style="text-align:justify; margin-bottom: 4px;", 
-                        tags$b("Gray colors", style = "color:#6b6b6b;"), 
-                        " indicate that the hidden word doesn't contain the corresponding letter."),
+                        tags$b(ls$GrayColors, style = "color:#6b6b6b;"), 
+                        ls$HowtoplayGrayDesc),
                  tags$p(style="text-align:justify; margin-bottom: 4px;", 
-                        tags$b("Orange colors", style = "color:#ff8c00;"), 
-                        " indicate that the hidden word contains the corresponding letter, but the positioning of the letter is incorrect."), 
+                        tags$b(ls$OrangeColors, style = "color:#ff8c00;"), 
+                        ls$HowtoplayOrangeDesc), 
                  tags$p(style="text-align:justify; margin-bottom: 4px;", 
-                        tags$b("Green colors", style = "color:limegreen;"), 
-                        " indicate that the hidden word contains the corresponding letter, and the positioning of the letter is correct!"), 
+                        tags$b(ls$GreenColors, style = "color:limegreen;"), 
+                        ls$HowtoplayGreenDesc), 
                  tags$p(style="text-align:justify; margin-bottom: 4px;", 
-                        "Additionally, ", tags$b("Brown colors", style = "color:chocolate;"), 
-                        " in hardcore mode indicate that the letter does not provide any clues." ), 
-                 
-                 
-                 
+                        ls$HowtoplayBeforeBrown, tags$b(ls$BrownColors, style = "color:chocolate;"), 
+                        ls$HowtoplayAfterBrown ), 
                  ),
-    tabPanel("Tips", 
+    tabPanel(ls$MainTabTips, 
              tags$h3("Some Tips", style="font-weight:normal;"),
              tags$p(style="text-align:justify; margin-bottom: 8px", "For the initial round, OUTER and HOUSE can be good guesses, covering 3 vowels. "), 
              tags$p(style="text-align:justify; margin-bottom: 8px", "A good follow-up can be ALICE or RAINY, covering the remaining two vowels."), 
@@ -207,40 +239,33 @@ ui <- fluidPage(
                     tags$b("Remember:"), 
                     " There can be more than one copy of the same letter, which happens frequently with vowels. Thus, it can be important to test for multiplicities with guesses like THERE or APPLY. "), 
         ),
-    tabPanel("Options", 
-             tags$h3("Options", style="font-weight:normal;"),
+    tabPanel(ls$MainTabOptions, 
+             tags$h3(ls$MainTabOptions, style="font-weight:normal;"),
              tabsetPanel(
-               tabPanel("Gameplay",
-                selectInput("word_difficulty", "Word difficulty", 
-                            choices = list("Impossible" = 2, "Normal" = 1), selected = 1, selectize = F),
-                #helper(
+               tabPanel(ls$OptionsTabGamePlay,
+                selectInput("word_difficulty", ls$WordDifficulty, 
+                            choices = foList(ls$WordDifficultyImpossible, 2, ls$WordDifficultyNormal, 1), selected = 1, selectize = F),
                   tags$div(
-                  #style = "display: inline-block", 
-                  tags$a(id = "hardcore_mode_label", "Hardcore Mode:"),
-                  materialSwitch(inputId = "hardcore_mode", label = "", status = "warning", inline = T),
-                  tags$b("Enabled", style = "color: orange;", id = "hardcore_enabled_label")
-                  #uiOutput("hardcore_enabled_label")
+                    tags$a(id = "hardcore_mode_label", ls$HardcoreModeLabel),
+                    materialSwitch(inputId = "hardcore_mode", label = "", status = "warning", inline = T),
+                    tags$b(ls$HardcoreModeEnabledLabel, style = "color: orange;", id = "hardcore_enabled_label")
                   ), 
-                #type = "markdown", id = "hardcore_mode_tooltip"), 
                 bsTooltip(id = "hardcore_mode_label", 
-                          title = "In hardcore mode, entering a word that is not in the dictionary still counts as a guess, but provides no clues. "), 
+                          title = ls$HardcoreModeTooltip), 
                ),
-               tabPanel("Visuals",
-                selectInput("anim_speed", "Animation Speed:", 
-                            choices = list("Off" = 1, "0.5x" = 2, "1x" = 3, "2x" = 4, "4x" = 5), selected = 3, selectize = F),
-                selectInput("night_mode", "Night mode:", 
-                           choices = list("Enabled" = 1, "Disabled" = 2), selected = 1, selectize = F)
+               tabPanel(ls$OptionsTabVisuals,
+                selectInput("anim_speed", ls$AnimationSpeedLabel, 
+                            choices = foList(ls$AnimationSpeedOff, 1, "0.5x", 2, "1x", 3, "2x", 4, "4x", 5), selected = 3, selectize = F),
+                selectInput("night_mode", ls$NightModeLabel, 
+                           choices = foList(ls$NightModeEnabled, 1, ls$NightModeDisabled, 2), selected = 1, selectize = F)
              ),
-             tabPanel("Keyboard",
-                selectInput("keyboard_style", "Keyboard Style:", 
-                            choices = list("Abcd" = 1, "Qwerty (experimental)" = 2), selected = 2, selectize = F),   
-                sliderInput("keyboard_size", "Keyboard Size:", 0.8, 1.5, 1, step = 0.05)
+             tabPanel(ls$OptionsTabKeyboard,
+                selectInput("keyboard_style", ls$KeyboardStyleLabel, 
+                            choices = foList(ls$KeyboardStyleAbcd, 1, ls$KeyboardStyleQwerty, 2), selected = 2, selectize = F),   
+                sliderInput("keyboard_size", ls$KeyboardSizeLabel, 0.8, 1.5, 1, step = 0.05)
                 )
              )
-             #tags$h4("Animation", style="font-weight:bold;"),
     )
-    
-    
     )
 )
 
@@ -250,46 +275,37 @@ cs_dark <- list(background = "#FCFCFC", selected = "#F5F5B2", grayclue = "silver
 fox <- function(txt, qwer = T, animTime = 0, colorset = cs_light) {
     bgcolor <- paste("background-color:", colorset$background, ";", sep = "");
     
-    #bgcolor <- "background-color:mintcream;";
-    
     if(qwer >= 0.75){
       bgcolor <- paste("background-color:", colorset$selected, ";", sep = "");
-        #bgcolor <- "background-color:beige;";
     }
     
     if(animTime == 0){
-    
-    if(qwer == 0.5){
-      bgcolor <- paste("background-color:", colorset$selected, ";", sep = "");
-    }
+      if(qwer == 0.5){
+        bgcolor <- paste("background-color:", colorset$selected, ";", sep = "");
+      }
+        
+      if(qwer == 1){
+        bgcolor <- paste("background-color:", colorset$grayclue, ";", sep = "");
+      }
       
-    if(qwer == 1){
-      bgcolor <- paste("background-color:", colorset$grayclue, ";", sep = "");
-    }
-    
-    if(qwer == 2){
-        #bgcolor <- "background-color:Tomato;";
-      bgcolor <- paste("background-color:", colorset$orangeclue, ";", sep = "");
-    }
-    
-    if(qwer == 3){
-      bgcolor <- paste("background-color:", colorset$greenclue, ";", sep = "");
-    }
+      if(qwer == 2){
+        bgcolor <- paste("background-color:", colorset$orangeclue, ";", sep = "");
+      }
       
-    if(qwer == 0.75){
-      bgcolor <- paste("background-color:", colorset$noclue, ";", sep = "");
-      #bgcolor <- "background-color:beige;";
-    }
-      
+      if(qwer == 3){
+        bgcolor <- paste("background-color:", colorset$greenclue, ";", sep = "");
+      }
+        
+      if(qwer == 0.75){
+        bgcolor <- paste("background-color:", colorset$noclue, ";", sep = "");
+      }
     }
     
-   # column(width = 2, 
     tags$div(
         style = "width:64px; height:61px; line-height: 61px; text-align: center; border: 2px solid #000000;",
         style = bgcolor,
         tags$span(txt, style = "text-align: center; font-size: 38px;, display: inline-block; color: black; "),
     )
-#    )
 }
 
 fox_line <- function(line_values, colorset = cs_light) {
@@ -308,7 +324,6 @@ fox_line <- function(line_values, colorset = cs_light) {
 
 #
 fo_line_init <- function(qwer_val = 0, anim_time = 0){
-    #initial_txt <- c("A", "B", "C", "D", "E")
     initial_txt <- c("", "", "", "", "")
     reactiveValues(qwer=seq(qwer_val, qwer_val, length.out = 5), 
                    txt = initial_txt, 
@@ -341,15 +356,12 @@ server <- function(input, output, session) {
     current_streak <- reactiveVal(0)
     
     current_animation <- reactiveVal(0)
-    #animation_speed <- reactiveVal(0.25)
-    
-    #animationTimer <- reactiveTimer(500)
-    
     current_col <- reactiveVal(1)
     current_line <- reactiveVal(1)
     is_ended <- reactiveVal(F)
     is_hardcore_enabled <- reactiveVal(FALSE)
     
+    initialized <- reactiveVal(FALSE)
     
     animation_speed <- reactive({
       req(input$anim_speed)
@@ -358,18 +370,24 @@ server <- function(input, output, session) {
       return(speed)
     })
     
-
-    
-    
     observe({
-      #animationTimer()
       if(animation_speed() > 0){
         invalidateLater(animation_speed()*1000, session)
       } else {
         invalidateLater(1000, session)
       }
       isolate(foAnimationTick())
+      if(initialized() == F){
+        isolate(foInitialize())
+        isolate(initialized(T))
+      }
     })
+    
+    foInitialize <- function(){
+      if(is_language_tr){
+        removeTab(inputId = "main_tabset_panel", target = ls$MainTabTips, session = session)
+      }
+    }
     
     foAnimationTick <- function(){
       anim_speed <- animation_speed()
@@ -379,7 +397,6 @@ server <- function(input, output, session) {
         current_animation(0)
       }
       if(current_line() > 0){
-        #message("function Run")
         for(j in seq(1, current_line(), 1)){
           line <- foGetLine(j)
           animTime <- line$animTime
@@ -436,16 +453,6 @@ server <- function(input, output, session) {
         myline$txt = values
     }
     
-  #  toastr_clear_all <- function(with_animation = FALSE) {
-#        #session <- getSession()
- #       session$sendCustomMessage(
- #           type = 'toastr_clear',
- #           message = list(
-  #              with_animation = with_animation
- #           )
- #       )
-  #  }
-    
     fob <- function(buttonIndex){
         buttonVal = buttonValues[buttonIndex]
         cc <- current_col()
@@ -490,6 +497,13 @@ server <- function(input, output, session) {
         for(c in buttonValues){
             out_list[[c]] = 0
         }
+        
+        if(is_language_tr){
+          out_list$Q = 1
+          out_list$W = 1
+          out_list$X = 1
+        }
+        
         if(current_line() > 1){
         for(j in seq(1, min(current_line(), 6), 1)){
             line_j <- switch(j, line1, line2, line3, line4, line5, line6)
@@ -528,8 +542,6 @@ server <- function(input, output, session) {
         for(i in seq(1, 5, 1)){
             c = txtB[i]
             cs = substring(src_txt, i, i)
-           # message(c)
-            #message(cs)
             if(c == cs){
                 src_flt[[c]] = src_flt[[c]] - 1
                 qwer_values[i] = 3
@@ -556,9 +568,6 @@ server <- function(input, output, session) {
         line <- current_line_val()
         line$animTime <- animation_speed() + seq(0, 4, 1) * animation_speed()
         current_animation(animation_speed() * 6)
-        #line$animTime <- animTimes
-        
-        #current_line_val()$qwer = qwer_values
     }
     
     foHardcoreInvalidate <- function(){
@@ -570,8 +579,7 @@ server <- function(input, output, session) {
       current_animation(animation_speed() * 6)
     }
     
-    
-    word_found_comments = c("Lucky!", "Genius!", "Splendid!", "Niceee!", "Good job.", "Not bad.")
+    #word_found_comments = ls$WordFoundComments
     
     focheckCorrectness <- function(){
         txtB <- current_line_txt()
@@ -588,9 +596,6 @@ server <- function(input, output, session) {
         return(count == 5)
     }
     
-    #theme_css <- renderUI({
-    #  includeCSS("www/darkly.css")
-    #})
     
     observeEvent(input$night_mode, {
       if(input$night_mode == 1){
@@ -614,11 +619,11 @@ server <- function(input, output, session) {
     
     foLoseGame <- function(){
       is_ended(T)
-      delay(animation_speed() * 5000 + 1, toastr_error("Game is over"))
-      delay(250 + animation_speed() * 5500 + 1, toastr_error(paste("The correct word was:", source_text()), closeButton = T, timeOut = 50000, extendedTimeOut = 50000))
+      delay(animation_speed() * 5000 + 1, toastr_error(ls$GameIsOverNotification))
+      delay(250 + animation_speed() * 5500 + 1, toastr_error(paste(ls$CorrectWordWasNotification, source_text()), closeButton = T, timeOut = 50000, extendedTimeOut = 50000))
       if(current_streak() > 1){
         strk <- current_streak()
-        delay(500 + animation_speed() * 6000 + 1, toastr_error(paste("You have achieved streak: ", as.character(strk)), closeButton = T, timeOut = 3000, extendedTimeOut = 3000))
+        delay(500 + animation_speed() * 6000 + 1, toastr_error(paste(ls$YourCurrentStreakNotification, as.character(strk)), closeButton = T, timeOut = 3000, extendedTimeOut = 3000))
         current_streak(0)
       }
     }
@@ -649,19 +654,19 @@ server <- function(input, output, session) {
                     } else { # Found the answer
                         current_streak(current_streak() + 1)
                         is_ended(T)
-                        delay(animation_speed() * 5000 + 1, toastr_success("You found the answer. "))
-                        delay(250 + animation_speed() * 5500 + 1, toastr_success(word_found_comments[cl]))
+                        delay(animation_speed() * 5000 + 1, toastr_success(ls$YouFoundAnswerNotification))
+                        delay(250 + animation_speed() * 5500 + 1, toastr_success(ls$WordFoundComments[cl]))
                         if(current_streak() > 1){
-                          delay(500 + animation_speed() * 6000 + 1, toastr_success(paste("Your current streak is: ", as.character(current_streak()))))
+                          delay(500 + animation_speed() * 6000 + 1, toastr_success(paste(ls$YourCorrectStreakNotification, as.character(current_streak()))))
                         }
                     }
                 } else {
                     if(!is_hardcore_enabled()){
                       message("Not a member")
-                      toastr_warning("Word not found in the dictionary.")
+                      toastr_warning(ls$WordNotFoundNotification)
                     } else { # Switch to the next line
                       foHardcoreInvalidate()
-                      delay(animation_speed() * 4500 + 1, toastr_error("Word not found in the dictionary."))
+                      delay(animation_speed() * 4500 + 1, toastr_error(ls$WordNotFoundNotification))
                       if(cl < 6){
                         current_line(cl + 1)
                         current_col(1)
@@ -674,10 +679,10 @@ server <- function(input, output, session) {
                     }
                 }
             } else {
-                toastr_info("Please enter a 5 letter word.")
+                toastr_info(ls$PleaseEnter5LetterWordNotification)
             }
         } else {
-            toastr_info("Game is over. Click restart to play again. ")
+            toastr_info(ls$GameOverRestartNotification)
         }
     }
     
@@ -712,23 +717,16 @@ server <- function(input, output, session) {
     #}
     
     foRestartRandomize <- function(word_list){
-        #indices <- sample(1:length(buttonValues), 5, replace=T)
         str <- foGetRandomWord(word_list)
-        #selected_index <- sample(1:length(words_common[,]), 1, replace=T)
-        #str <- toupper(words_common[selected_index, ])
+        #indices <- sample(1:length(buttonValues), 5, replace=T)
         #str <- ""
         #for(i in seq(1, 5, 1)){
         #    str = paste(str, buttonValues[indices[i]], sep="")
         #}
-        message(str)
         foRestart(str)
-        #toastr.clear()
-        #toastr_clear_all(with_animation = F)
-        toastr_success("Successfully restarted.")
-        toastr_success("The target word is updated. ")
+        toastr_success(ls$RestartedNotification)
+        toastr_success(ls$WordUpdatedNotification)
     }
-    
-
     
     # A = 1
     # B = 2
@@ -759,7 +757,7 @@ server <- function(input, output, session) {
     
     foReveal <- function(){
         #is_ended(T)
-        toastr_error(paste("Game is over. The correct word was:", source_text()))
+        toastr_error(paste(ls$GameOverNotification, source_text()))
     }
     
     observeEvent(input$buttonEnter, { foEnter() })
@@ -795,9 +793,6 @@ server <- function(input, output, session) {
     observeEvent(input$buttonY, { fob(25) })
     observeEvent(input$buttonZ, { fob(26) })
     
-    #observeEvent(input$b2, { fo(2, line1) })
-    #observeEvent(input$b3, { fo(3, line2) })
-    
     current_colorset <- reactive({
       switch(as.numeric(input$night_mode), cs_dark, cs_light)
     })
@@ -808,12 +803,20 @@ server <- function(input, output, session) {
     
     output$test_first_line <- renderUI({
         div_hardcore <- tags$div(style = "height:8px;")
+        if(is_language_tr){
+          margin_left_amount = 160 - 40;
+        } else {
+          margin_left_amount = 160 - 32;
+        }
+        
         if(is_hardcore_enabled()){
           div_hardcore <- tags$div(
-            style = "display: table; margin-left: 128px;", 
-            tags$strong("Hardcore Mode!", style = "color: #FE8110;"), 
+            style = "display: table;",
+            style = paste("margin-left: ", margin_left_amount, "px;", sep = ""), 
+            tags$strong(ls$HardcoreModeIndicatorLabel, style = "color: #FE8110;"), 
           )
         }
+        
         fluidRow(
             div_hardcore, 
             fox_line(line1, current_colorset()),
@@ -840,7 +843,6 @@ server <- function(input, output, session) {
         }
         
         if(qwer == 2){
-            #bgcolor <- "background-color:Tomato;";
             bgcolor <- paste("background:", colorset$orangeclue, ";", sep = "");
         }
         
@@ -893,11 +895,9 @@ server <- function(input, output, session) {
       }
     })
     
-    
-    
     foUpdateHardcoreLabel <- function(){
       if(input$hardcore_mode == T){
-        runjs("document.getElementById('hardcore_enabled_label').innerHTML = 'Enabled';")
+        runjs(paste("document.getElementById('hardcore_enabled_label').innerHTML = '", ls$HardcoreModeEnabledLabel, "';", sep = ""))
         #runjs("document.getElementById('hardcore_mode_label').style.color = 'orange';")
         #runjs("document.getElementById('hardcore_mode_label').style.fontWeight = 'bold';")
       } else {
@@ -909,14 +909,6 @@ server <- function(input, output, session) {
     }
     
     observeEvent(input$hardcore_mode, { foUpdateHardcoreLabel() })
-    
-  #  output$hardcore_enabled_label <- renderUI({
-  #    if(input$hardcore_mode == T)
-  #      tags$div(
-  #        style = "display: inline-block;",
-  #        tags$b("Enabled", style = "color: red;")
-  #      )
-   # })
     
     output$buttons <- renderUI({
         req(flattened_letters())
@@ -995,6 +987,7 @@ server <- function(input, output, session) {
         }
     })
 }
+
 
 # Run the application 
 shinyApp(ui = ui, server = server)
