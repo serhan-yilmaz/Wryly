@@ -20,8 +20,8 @@ library(shinyhelper)
 
 ### CURRENT LANGUAGE SPECIFIER 
 
-CURRENT_LANGUAGE = "TR"
-#CURRENT_LANGUAGE = "EN"
+#CURRENT_LANGUAGE = "TR"
+CURRENT_LANGUAGE = "EN"
 
 ##############################
 
@@ -39,12 +39,18 @@ if(is_language_en){
   words_common <- read.csv("wordscommon5.txt", header=F);
   source("language_set_en.R");
   ls <- language_set_en()
+  keyboard_default_size <- 1
+  keyboard_default_hor_margin <- 2
+  keyboard_default_ver_margin <- 4
 } else {
   Sys.setlocale(category = "LC_ALL", locale = "Turkish")
   words_all <- read.csv("words_all_tr.txt", header=F);
-  words_common <- read.csv("words_common_tr.txt", header=F);
+  words_common <- read.csv("words_common5_tr.txt", header=F);
   source("language_set_tr.R");
   ls <- language_set_tr()
+  keyboard_default_size <- 0.9
+  keyboard_default_hor_margin <- 1
+  keyboard_default_ver_margin <- 3
 }
 
 message(ls$MainTabHowToPlay)
@@ -107,6 +113,12 @@ ui <- fluidPage(
       if (e.which == 8) {$('#buttonBackspace').click() }
       if (e.which == 13) {$('#buttonEnter').click() }
       if (e.which == 27) {$('#buttonClear').click() }
+      if (e.which == 219) {$('#buttonGg').click() }
+      if (e.which == 221) {$('#buttonUu').click() }
+      if (e.which == 186) {$('#buttonSs').click() }
+      if (e.which == 222) {$('#buttonIi').click() }
+      if (e.which == 191) {$('#buttonOo').click() }
+      if (e.which == 220) {$('#buttonCc').click() }
       });
       })")),
 
@@ -216,7 +228,7 @@ ui <- fluidPage(
                  tags$p(style="text-align:justify; margin-bottom: 8px", ls$HowtoplayGuesses),
                  tags$p(style="text-align:justify; margin-bottom: 8px;",ls$HowtoplayClues), 
                  tags$p(style="text-align:justify; margin-bottom: 4px;", 
-                        tags$b(ls$GrayColors, style = "color:#6b6b6b;"), 
+                        tags$b(ls$GrayColors, style = "color:#858585;", id = "gray_colors_label"), 
                         ls$HowtoplayGrayDesc),
                  tags$p(style="text-align:justify; margin-bottom: 4px;", 
                         tags$b(ls$OrangeColors, style = "color:#ff8c00;"), 
@@ -262,15 +274,33 @@ ui <- fluidPage(
              tabPanel(ls$OptionsTabKeyboard,
                 selectInput("keyboard_style", ls$KeyboardStyleLabel, 
                             choices = foList(ls$KeyboardStyleAbcd, 1, ls$KeyboardStyleQwerty, 2), selected = 2, selectize = F),   
-                sliderInput("keyboard_size", ls$KeyboardSizeLabel, 0.8, 1.5, 1, step = 0.05)
-                )
+                sliderInput("keyboard_size", ls$KeyboardSizeLabel, 0.8, 1.5, keyboard_default_size, step = 0.05, pre = "x"),
+                tags$div(style="display: inline-table; margin-right: 32px;",
+                         sliderInput("keyboard_hor_margin", ls$KeyboardHorizontalMargin, 0, 4, keyboard_default_hor_margin, step = 1, width = 130)),
+                tags$div(style="display: inline-table;",
+                         sliderInput("keyboard_ver_margin", ls$KeyboardVerticalMargin, 0, 4, keyboard_default_ver_margin, step = 1, width = 130)),
+                
+                                )
              )
     )
     )
 )
 
-cs_light <- list(background = "#FCFCFC", selected = "#F5F5CE;", grayclue = "gainsboro", orangeclue = "Orange", greenclue = "lawngreen", noclue = "chocolate")
-cs_dark <- list(background = "#FCFCFC", selected = "#F5F5B2", grayclue = "silver", orangeclue = "Orange", greenclue = "lawngreen", noclue = "chocolate")
+
+buttonValues = c("A", "B", "C", "D", "E", "F", "G", "H", "I", 
+                 "J", "K", "L", "M", "N", "O", "P", "Q", "R", 
+                 "S", "T", "U", "V", "W", "X", "Y", "Z")
+
+if(is_language_tr){
+  buttonValues = c("A", "B", "C", "D", "E", "F", "G", "H", "I", 
+                   "J", "K", "L", "M", "N", "O", "P", "Q", "R", 
+                   "S", "T", "U", "V", "W", "X", "Y", "Z", 
+                   "Ğ","Ü", "Ş", "İ", "Ö", "Ç")
+}
+
+
+cs_light <- list(background = "#FCFCFC", selected = "#F5F5CE;", grayclue = "gainsboro", orangeclue = "Orange", greenclue = "lawngreen", noclue = "chocolate", graycluetext = "#6b6b6b")
+cs_dark <- list(background = "#FCFCFC", selected = "#F5F5B2", grayclue = "silver", orangeclue = "Orange", greenclue = "lawngreen", noclue = "chocolate", graycluetext = "#9b9b9b")
 
 fox <- function(txt, qwer = T, animTime = 0, colorset = cs_light) {
     bgcolor <- paste("background-color:", colorset$background, ";", sep = "");
@@ -337,11 +367,18 @@ server <- function(input, output, session) {
     switch(as.numeric(input$word_difficulty), words_common, words_all)
   })
   
+  foToUpper <- function(txt){
+    if(is_language_tr){
+      return(toupper(gsub("ı", "I", gsub("i", "İ", txt))))
+    }
+    toupper(txt)
+  }
+  
   foGetRandomWord <- function(word_list=words_common){
     #word_list <- current_word_list()
     #word_list <- words_common
     selected_index <- sample(1:length(word_list[,]), 1, replace=T)
-    str <- toupper(word_list[selected_index, ])
+    str <- foToUpper(word_list[selected_index, ])
   }
   
     source_text <- reactiveVal(foGetRandomWord())
@@ -385,7 +422,7 @@ server <- function(input, output, session) {
     
     foInitialize <- function(){
       if(is_language_tr){
-        removeTab(inputId = "main_tabset_panel", target = ls$MainTabTips, session = session)
+        #removeTab(inputId = "main_tabset_panel", target = ls$MainTabTips, session = session)
       }
     }
     
@@ -528,8 +565,16 @@ server <- function(input, output, session) {
         out_list
     })
     
+    foToLower <- function(txt){
+      if(is_language_en){
+        return(tolower(txt))
+      }
+      tolower(gsub("I", "ı", gsub("İ", "i", txt)))
+    }
+    
     foCheckDictionary <- function(){
-        is.element(tolower(paste(current_line_txt(), collapse='')), words_all[,])
+       # message(foToLower(paste(current_line_txt(), collapse='')))
+        is.element(foToLower(paste(current_line_txt(), collapse='')), words_all[,])
     }
     
     foTestAndUpdate <- function(){
@@ -605,6 +650,8 @@ server <- function(input, output, session) {
         runjs("document.body.style.color = 'white'")
         runjs("document.documentElement.style.setProperty('--some-color', '#16F529');")
         runjs("document.documentElement.style.setProperty('--toast-opacity', 0.97);")
+        runjs(paste("document.getElementById('gray_colors_label').style.color = '", cs_dark$graycluetext, "';", sep = ""))
+        
       } else {
         runjs(" removeLink(themes.dark);
                 head.removeChild(extraDarkThemeElement);
@@ -612,6 +659,7 @@ server <- function(input, output, session) {
         runjs("document.documentElement.style.setProperty('--some-color', 'Black');")
         runjs("document.body.style.color = 'black'")
         runjs("document.documentElement.style.setProperty('--toast-opacity', 0.8);")
+        runjs(paste("document.getElementById('gray_colors_label').style.color = '", cs_light$graycluetext, "';", sep = ""))
         #runjs("document.body.style.backgroundColor = 'black';")
       }
       foUpdateHardcoreLabel()
@@ -707,10 +755,6 @@ server <- function(input, output, session) {
         }
     }
     
-    buttonValues = c("A", "B", "C", "D", "E", "F", "G", "H", "I", 
-                     "J", "K", "L", "M", "N", "O", "P", "Q", "R", 
-                     "S", "T", "U", "V", "W", "X", "Y", "Z")
-    
     #foRandomizeSource <- function(){
     #    str <- foGetRandomWord()
     #    foRestart(str)
@@ -792,6 +836,12 @@ server <- function(input, output, session) {
     observeEvent(input$buttonX, { fob(24) })
     observeEvent(input$buttonY, { fob(25) })
     observeEvent(input$buttonZ, { fob(26) })
+    observeEvent(input$buttonGg, { fob(27) })
+    observeEvent(input$buttonUu, { fob(28) })
+    observeEvent(input$buttonSs, { fob(29) })
+    observeEvent(input$buttonIi, { fob(30) })
+    observeEvent(input$buttonOo, { fob(31) })
+    observeEvent(input$buttonCc, { fob(32) })
     
     current_colorset <- reactive({
       switch(as.numeric(input$night_mode), cs_dark, cs_light)
@@ -866,19 +916,43 @@ server <- function(input, output, session) {
         min_width_txt = paste("min-width: ", min_width, "px;", sep = "") 
         font_size_txt = paste("font-size: ", font_size, "px;", sep = "") 
         
+        
+        margin_hor <- input$keyboard_hor_margin
+        margin_ver <- input$keyboard_ver_margin
+        
+        margin_right = floor(margin_hor/2) + (margin_hor %% 2)
+        margin_left = floor(margin_hor/2)
+        
+        margin_top = floor(margin_ver/2) 
+        margin_bottom = floor(margin_ver/2) + (margin_ver %% 2)
+        
+        # if(is_language_tr){
+        #   margin_right = 0
+        #   margin_top = 1
+        # } else {
+        #   margin_right = 1
+        #   margin_top = 2
+        # }
+        
         actionButton(buttonId, buttonTxt, style = bgcolor, style = "color: #333333;", 
-                     style = "margin-bottom: 2px; margin-top:2px; margin-left: 1px; margin-right: 1px;",
+                     style = paste("margin-left: ", margin_left, "px;", sep = ""),
+                     style = paste("margin-right: ", margin_right, "px;", sep = ""),
+                     style = paste("margin-bottom: ", margin_bottom, "px;", sep = ""),
+                     style = paste("margin-top: ", margin_top, "px;", sep = ""),
                      style = padding_all, 
                      style = font_size_txt,
                      style = min_width_txt)
     }
     
     output$controlButtons <- renderUI({
+      size_multiplier  <- current_keyboardsize()
+      ver_gap = input$keyboard_ver_margin
+      font_size = 15 * size_multiplier
+      font_size_txt = paste("font-size: ", font_size, "px;", sep = "") 
+      margin_top_txt = paste("margin-top: ", 1 + floor(ver_gap/2), "px;", sep = "") 
+      ctr_style_extra = paste(font_size_txt, margin_top_txt, sep = "")
+      #message(ctr_style_extra)
       if(input$keyboard_style == 1){
-        size_multiplier  <- current_keyboardsize()
-        font_size = 14 * size_multiplier
-        font_size_txt = paste("font-size: ", font_size, "px;", sep = "") 
-        ctr_style_extra = font_size_txt
         tags$div(
           style = "margin: 0px;", 
           actionButton("buttonEnter", "Enter", stype = controlButtonStyle, style = ctr_style_extra),
@@ -888,9 +962,9 @@ server <- function(input, output, session) {
       } else {
           tags$div(
             style = "display: table; margin:0 auto;", 
-            actionButton("buttonEnter", "Enter", stype = controlButtonStyle),
-            actionButton("buttonBackspace", "Backspace", style = controlButtonStyle),
-            actionButton("buttonClear", "Clear", style = controlButtonStyle),
+            actionButton("buttonEnter", "Enter", stype = controlButtonStyle, style = ctr_style_extra),
+            actionButton("buttonBackspace", "Backspace", style = controlButtonStyle, style = ctr_style_extra),
+            actionButton("buttonClear", "Clear", style = controlButtonStyle, style = ctr_style_extra),
           )
       }
     })
@@ -910,8 +984,40 @@ server <- function(input, output, session) {
     
     observeEvent(input$hardcore_mode, { foUpdateHardcoreLabel() })
     
+    foConditionalButton <- function(buttonId, buttonTxt, condition){
+      out <- tags$div(style = "width:0px; height:0px; margin:0px; padding:0px;")
+      if(condition){
+        out <- foActionButton(buttonId, buttonTxt)
+      }
+      return(out)
+    }
+    
+    
     output$buttons <- renderUI({
         req(flattened_letters())
+        
+        is_tr = is_language_tr
+      
+        buttonIlabel = "I"
+      #  if(is_tr){ buttonIlabel = "İ"; }
+        
+       # "ĞÜŞİÖÇ"
+        
+        qwerDiv1 <- tags$div(style = "width:0px")
+        qwerDiv2 <- tags$div(style = "width:0px")
+        qwerDiv3 <- tags$div(style = "width:0px")
+        if(is_tr){
+          qwerDiv1 = tags$div(style = "display: inline-table; margin:0px; padding:0px;", 
+                              foActionButton("buttonGg", "Ğ"),foActionButton("buttonUu", "Ü")
+                              )
+          qwerDiv2 = tags$div(style = "display: inline-table; margin:0px; padding:0px;", 
+                              foActionButton("buttonSs", "Ş"),
+                              foActionButton("buttonIi", "İ"))
+          qwerDiv3 = tags$div(style = "display: inline-table; margin:0px; padding:0px;", 
+                              foActionButton("buttonOo", "Ö"),
+                              foActionButton("buttonCc", "Ç"))
+        }
+        
         if(input$keyboard_style == 1){
         tags$div(
             #style = "margin:0px; padding: 0px;", 
@@ -919,24 +1025,30 @@ server <- function(input, output, session) {
             foActionButton("buttonA", "A"),
             foActionButton("buttonB", "B"),
             foActionButton("buttonC", "C"),
+            foConditionalButton("buttonCc", "Ç", is_tr),
             foActionButton("buttonD", "D"),
             foActionButton("buttonE", "E"),
             foActionButton("buttonF", "F"),
             foActionButton("buttonG", "G"),
+            foConditionalButton("buttonGg", "Ğ", is_tr),
             foActionButton("buttonH", "H"),
-            foActionButton("buttonI", "I"),
+            foActionButton("buttonI", buttonIlabel),
+            foConditionalButton("buttonIi", "İ", is_tr),
             foActionButton("buttonJ", "J"),
             foActionButton("buttonK", "K"),
             foActionButton("buttonL", "L"),
             foActionButton("buttonM", "M"),
             foActionButton("buttonN", "N"),
             foActionButton("buttonO", "O"),
+            foConditionalButton("buttonOo", "Ö", is_tr),
             foActionButton("buttonP", "P"),
             foActionButton("buttonQ", "Q"),
             foActionButton("buttonR", "R"),
             foActionButton("buttonS", "S"),
+            foConditionalButton("buttonSs", "Ş", is_tr),
             foActionButton("buttonT", "T"),
             foActionButton("buttonU", "U"),
+            foConditionalButton("buttonUu", "Ü", is_tr),
             foActionButton("buttonV", "V"),
             foActionButton("buttonW", "W"),
             foActionButton("buttonX", "X"),
@@ -956,9 +1068,10 @@ server <- function(input, output, session) {
               foActionButton("buttonT", "T"),
               foActionButton("buttonY", "Y"),
               foActionButton("buttonU", "U"),
-              foActionButton("buttonI", "I"),
+              foActionButton("buttonI", buttonIlabel),
               foActionButton("buttonO", "O"),
-              foActionButton("buttonP", "P")
+              foActionButton("buttonP", "P"),
+              qwerDiv1
             ),
             tags$div(
               style = "display: table; margin:0 auto;", 
@@ -971,6 +1084,7 @@ server <- function(input, output, session) {
               foActionButton("buttonJ", "J"),
               foActionButton("buttonK", "K"),
               foActionButton("buttonL", "L"),
+              qwerDiv2
             ),
             tags$div(
               #style = "margin:0px; padding: 0px;", 
@@ -981,7 +1095,8 @@ server <- function(input, output, session) {
               foActionButton("buttonV", "V"),
               foActionButton("buttonB", "B"),
               foActionButton("buttonN", "N"),
-              foActionButton("buttonM", "M")
+              foActionButton("buttonM", "M"),
+              qwerDiv3
             )
           )
         }

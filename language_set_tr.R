@@ -4,7 +4,7 @@ Sys.setlocale(category = "LC_ALL", locale = "Turkish")
 
 language_set_tr <- function(){
   ls <- list()
-  ls$TitleText = "Wordplay, ama Türkçe!"
+  ls$TitleText = "Wordle, ama Türkçe!"
   ls$TitleBrowser = "Türkçe Wryly!"
   ls$MainTabGame =  "Oyun"
   ls$MainTabHowToPlay = "Nasıl oynanır?"
@@ -24,6 +24,8 @@ language_set_tr <- function(){
   ls$KeyboardStyleQwerty = "Qwerty (deneysel)"
   ls$KeyboardStyleAbcd = "Abcd"
   ls$KeyboardSizeLabel = "Klavye Boyutu:"
+  ls$KeyboardHorizontalMargin = "Yatay Bosluk:"
+  ls$KeyboardVerticalMargin = "Dikey Bosluk:"
   ls$AnimationSpeedLabel = "Animasyon Hızı:"
   ls$AnimationSpeedOff = "Kapalı"
   ls$NightModeLabel = "Gece modu:"
@@ -41,7 +43,7 @@ language_set_tr <- function(){
   ls$GreenColors = "Yeşil Renkler"
   ls$HowtoplayGreenDesc = "  ise hem gizli kelimenin o harfi içerdiğini, hem de harfin konumunun doğru olduğunu gösteriyor!"
   
-  ls$HowtoplayBeforeBrown = "Ek olarak, çetinçeviz modundaki "
+  ls$HowtoplayBeforeBrown = "Ek olarak, çetinceviz modundaki "
   ls$BrownColors = "Kahverengi Renkler"
   ls$HowtoplayAfterBrown = " o harfin herhangi bir ipucu vermediği anlamına geliyor."
   

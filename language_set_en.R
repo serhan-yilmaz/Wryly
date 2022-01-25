@@ -24,6 +24,8 @@ language_set_en <- function(){
   ls$KeyboardStyleQwerty = "Qwerty (experimental)"
   ls$KeyboardStyleAbcd = "Abcd"
   ls$KeyboardSizeLabel = "Keyboard Size:"
+  ls$KeyboardHorizontalMargin = "Horizontal Margin:"
+  ls$KeyboardVerticalMargin = "Vertical Margin:"
   ls$AnimationSpeedLabel = "Animation Speed:"
   ls$AnimationSpeedOff = "Off"
   ls$NightModeLabel = "Night mode:"
