@@ -11,6 +11,7 @@ library(shiny)
 library(shinyjs)
 library(shinytoastr)
 library(shinyWidgets)
+library(shinybrowser)
 #library(bslib)
 library(shinythemes)
 
@@ -20,8 +21,8 @@ library(shinyhelper)
 
 ### CURRENT LANGUAGE SPECIFIER 
 
-#CURRENT_LANGUAGE = "TR"
-CURRENT_LANGUAGE = "EN"
+CURRENT_LANGUAGE = "TR"
+#CURRENT_LANGUAGE = "EN"
 
 ##############################
 
@@ -79,6 +80,7 @@ foList <- function(...){
 ui <- fluidPage(
     useToastr(),
     useShinyjs(),
+    shinybrowser::detect(),
     theme = shinytheme("cerulean"),
     tags$style(type='text/css', ".container-fluid { padding: 14px; padding-right: 15px; min-height: 0;}"),
     
@@ -216,14 +218,19 @@ ui <- fluidPage(
                     style = "padding: 4px; margin-left: 11px; margin-top: 0px; padding-top: 0px;", 
                     actionButton("buttonRestartRandomize", ls$RestartUpdateButtonLabel)
                     #,textInput("text","Write something:"),
-                    #,actionButton("buttonReveal", "Reveal")
+                    #,actionButton("buttonReveal", "Reveal"),
+                    #,tags$a(id = "test_label", "abcd"),
                     ), 
             )
         )
     )
         ),
-        tabPanel(ls$MainTabHowToPlay, 
-                 tags$h3(ls$MainTabHowToPlay, style="font-weight:normal;"),
+      tabPanel(ls$MainTabHowToPlay, 
+               #tags$h3(ls$MainTabHowToPlay, style="font-weight:normal;"),
+               tags$div(style = "margin-top: 2px;"),
+        tabsetPanel(
+          tabPanel(ls$HowtoplayTabBasics, 
+                 tags$div(style = "margin-top: 10px;"),
                  tags$p(style="text-align:justify; margin-bottom: 8px", ls$HowtoplayAim), 
                  tags$p(style="text-align:justify; margin-bottom: 8px", ls$HowtoplayGuesses),
                  tags$p(style="text-align:justify; margin-bottom: 8px;",ls$HowtoplayClues), 
@@ -240,17 +247,20 @@ ui <- fluidPage(
                         ls$HowtoplayBeforeBrown, tags$b(ls$BrownColors, style = "color:chocolate;"), 
                         ls$HowtoplayAfterBrown ), 
                  ),
-    tabPanel(ls$MainTabTips, 
-             tags$h3("Some Tips", style="font-weight:normal;"),
-             tags$p(style="text-align:justify; margin-bottom: 8px", "For the initial round, OUTER and HOUSE can be good guesses, covering 3 vowels. "), 
-             tags$p(style="text-align:justify; margin-bottom: 8px", "A good follow-up can be ALICE or RAINY, covering the remaining two vowels."), 
-             tags$p(style="text-align:justify; margin-bottom: 8px", "SYNCH or GLYPH can be good options to test multiple consonants at the same time."), 
-            # tags$p(style="text-align:justify; margin-bottom: 8px", "For example, OUTER + SYNCH + PLAID can be a good opening strategy, covering 15 letters."),
-             
-             tags$p(style="text-align:justify; margin-bottom: 8px", 
-                    tags$b("Remember:"), 
-                    " There can be more than one copy of the same letter, which happens frequently with vowels. Thus, it can be important to test for multiplicities with guesses like THERE or APPLY. "), 
-        ),
+        tabPanel(ls$MainTabTips, 
+                 tags$div(style = "margin-top: 10px;"),
+              # tags$h3("Tips", style="font-weight:normal;"),
+               tags$p(style="text-align:justify; margin-bottom: 8px", ls$TipsInitialRound), 
+               tags$p(style="text-align:justify; margin-bottom: 8px", ls$TipsFollowup), 
+               tags$p(style="text-align:justify; margin-bottom: 8px", ls$TipsAdditional), 
+              # tags$p(style="text-align:justify; margin-bottom: 8px", "For example, OUTER + SYNCH + PLAID can be a good opening strategy, covering 15 letters."),
+               
+               tags$p(style="text-align:justify; margin-bottom: 8px", 
+                      tags$b(ls$TipsRememberLabel), 
+                      ls$TipsRememberText), 
+          )
+      )
+    ),
     tabPanel(ls$MainTabOptions, 
              tags$h3(ls$MainTabOptions, style="font-weight:normal;"),
              tabsetPanel(
@@ -421,7 +431,59 @@ server <- function(input, output, session) {
     })
     
     foInitialize <- function(){
-      if(is_language_tr){
+      current_width = shinybrowser::get_width()
+      message(current_width)
+      runjs(paste("document.getElementById('test_label').innerHTML = 'width = ", current_width, "';", sep = ""))
+      keyboard_size = 0.8;
+      update = FALSE
+      
+      if((current_width >= 300) && (current_width <= 330)){
+        keyboard_size = 0.8;
+        update = TRUE
+      }
+      
+      if((current_width >= 330) && (current_width <= 375)){
+        keyboard_size = 0.85;
+        update = TRUE
+      }
+      
+      if((current_width >= 375) && (current_width <= 700)){
+        keyboard_size = 0.9;
+        update = TRUE
+      }
+      
+      if((current_width >= 390) && (current_width <= 700)){
+        keyboard_size = 0.95;
+        update = TRUE
+      }
+      
+      if((current_width >= 415) && (current_width <= 700)){
+        keyboard_size = 1;
+        update = TRUE
+      }
+      
+      if((current_width >= 450) && (current_width <= 700)){
+        keyboard_size = 1.1;
+        update = TRUE
+      }
+      
+      if((current_width >= 500) && (current_width <= 700)){
+        keyboard_size = 1.2;
+        update = TRUE
+      }
+      
+      if((current_width >= 1110)){
+        val = 0.9 + floor((current_width - 1110)/ 54) * 0.05
+        keyboard_size = min(1.3, val)
+        update = TRUE
+      }
+      
+      if(is_language_en){
+        keyboard_size = keyboard_size + 0.15
+      }
+      
+      if(update){
+       updateSliderInput(session, "keyboard_size", value = keyboard_size)
         #removeTab(inputId = "main_tabset_panel", target = ls$MainTabTips, session = session)
       }
     }
@@ -767,9 +829,14 @@ server <- function(input, output, session) {
         #for(i in seq(1, 5, 1)){
         #    str = paste(str, buttonValues[indices[i]], sep="")
         #}
+        was_ongoing <- !is_ended()
+        hidden_word <- source_text()
         foRestart(str)
         toastr_success(ls$RestartedNotification)
         toastr_success(ls$WordUpdatedNotification)
+        if(was_ongoing == T){
+          toastr_info(paste(ls$HiddenWordWasNotification, " ", hidden_word, sep = ""))
+        }
     }
     
     # A = 1

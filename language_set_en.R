@@ -10,6 +10,7 @@ language_set_en <- function(){
   ls$MainTabHowToPlay = "How to Play?"
   ls$MainTabTips = "Tips"
   ls$MainTabOptions = "Options"
+  ls$HowtoplayTabBasics = "Basics"
   ls$OptionsTabGamePlay = "Gameplay"
   ls$OptionsTabVisuals = "Visuals"
   ls$OptionsTabKeyboard = "Keyboard"
@@ -59,8 +60,15 @@ language_set_en <- function(){
   ls$YouFoundAnswerNotification = "You found the answer. "
   ls$RestartedNotification = "Successfully restarted."
   ls$WordUpdatedNotification = "The target word is updated. "
+  ls$HiddenWordWasNotification = "The hidden word was:"
   
   ls$WordFoundComments = c("Lucky!", "Genius!", "Splendid!", "Niceee!", "Good job.", "Not bad.")
+  
+  ls$TipsInitialRound = "For the initial round, OUTER and HOUSE can be good guesses, covering 3 vowels. "
+  ls$TipsFollowup = "A good follow-up can be ALICE or RAINY, covering the remaining two vowels."
+  ls$TipsAdditional = "SYNCH or GLYPH can be good options to test multiple consonants at the same time."
+  ls$TipsRememberLabel = "Remember:"
+  ls$TipsRememberText = " There can be more than one copy of the same letter, which happens frequently with vowels. Thus, it can be important to test for multiplicities with guesses like THERE or APPLY. "
   
   return(ls)
 }

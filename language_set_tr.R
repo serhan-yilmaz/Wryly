@@ -8,8 +8,9 @@ language_set_tr <- function(){
   ls$TitleBrowser = "Türkçe Wryly!"
   ls$MainTabGame =  "Oyun"
   ls$MainTabHowToPlay = "Nasıl oynanır?"
-  ls$MainTabTips = "Tüyo"
+  ls$MainTabTips = "Tüyolar"
   ls$MainTabOptions = "Seçenekler"
+  ls$HowtoplayTabBasics = "Temel Bilgiler"
   ls$OptionsTabGamePlay = "Oynanış"
   ls$OptionsTabVisuals = "Görseller"
   ls$OptionsTabKeyboard = "Klavye"
@@ -59,8 +60,17 @@ language_set_tr <- function(){
   ls$YouFoundAnswerNotification = "Kelimeyi buldun. "
   ls$RestartedNotification = "Oyun yeniden baslatıldı. "
   ls$WordUpdatedNotification = "Gizli kelime değişti. "
+  ls$HiddenWordWasNotification = "Gizli kelime şuydu:"
   
   ls$WordFoundComments = c("Şanslısın!", "Dahice!", "Süper!", "Güzeeel!", "İyi iş.", "Fena değil.")
+  
+  ls$TipsInitialRound = "İlk tur için KAİDE 3 sesli harfi kapsayan, iyi bir seçenek olabilir."
+  ls$TipsFollowup = "Devamında, ÇÖZÜM ya da TORUN iyi seçenekler olabilir, geriye kalan 2 sesli harfi daha kapsayan."
+ # ls$TipsAdditional = "İlk sesli harfi yakaladıktan sonra geri kalanları bulabilmek için büyük ünlü uyumunu hesaba katmak yararlı olabilir. Mesela A harfiden sonra I, O ya da U'yu test etmek gibi."
+    ls$TipsAdditional = "Tahminlerde Büyük Ünlü Uyumunu dikkate almak önemli. Fakat, KÜLOT gibi buna uymayan kelimelerin de var olduğu unutulmamalı."
+  ls$TipsRememberLabel = "Hatırlatma:"
+  ls$TipsRememberText = " Bir kelimede birden fazla aynı harften bulunabilir ki bu özellikle sesli harfler için yaygın bir durum. O yüzden, KAPAK ya da CACIK gibi tahminlerle bu tarz tekrarları test etmek önemli olabilir. "
+  
   
   
   return(ls)
