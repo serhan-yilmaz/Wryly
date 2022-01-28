@@ -3,7 +3,7 @@ Wryly is a web application implementing and adapting a popular word game (known 
 
 To access the game, please visit: [Wryly Website](https://syilmaz.shinyapps.io/wryly).
 
-<img src="images/wryly_img_1.png" width="150"> <img src="images/wryly_img_2.png" width="148"> <img src="images/wryly_img_3.png" width="155">
+<img src="images/wryly_img_1.png" width="150"> <img src="images/wryly_img_2.png" width="149"> <img src="images/wryly_img_3.png" width="158">
 
 ## Running Locally
 To run the Wryly application locally on your R installation, simply run:
