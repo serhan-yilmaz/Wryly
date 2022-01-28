@@ -7,6 +7,9 @@ To access the game, please visit: [Wryly Website](https://syilmaz.shinyapps.io/w
 <br>
 <img src="images/wryly_img_4.png" width="210">    <img src="images/wryly_img_5.png" width="212"> 
 
+# Turkish Version
+Wryly is now also available in Turkish! To access the Turkish version, please visit: [Wryly TR](https://syilmaz.shinyapps.io/wryly_tr).
+
 ## Running Locally
 To run the Wryly application locally on your R installation, simply run:
 ```
