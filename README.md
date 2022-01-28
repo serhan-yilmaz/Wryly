@@ -5,7 +5,7 @@ To access the game, please visit: [Wryly Website](https://syilmaz.shinyapps.io/w
 
 <img src="images/wryly_img_1.png" width="150"> <img src="images/wryly_img_2.png" width="149"> <img src="images/wryly_img_3.png" width="158"> 
 <br>
-<img src="images/wryly_img_4.png" width="210">    <img src="images/wryly_img_5.png" width="228"> 
+<img src="images/wryly_img_4.png" width="210">    <img src="images/wryly_img_5.png" width="229"> 
 
 ## Running Locally
 To run the Wryly application locally on your R installation, simply run:
