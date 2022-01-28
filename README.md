@@ -12,7 +12,7 @@ Wryly is now also available in Turkish! To access the Turkish version, please vi
 
 For more information and Turkish descriptions, please visit: http://wordleturkce.online/
 
-<img src="images/wryly_tr_img_3.png" width="170"> <img src="images/wryly_tr_img_1.png" width="150"> <img src="images/wryly_tr_img_2.png" width="226"> 
+<img src="images/wryly_tr_img_3.png" width="160"> <img src="images/wryly_tr_img_1.png" width="150"> <img src="images/wryly_tr_img_2.png" width="226"> 
 
 ## Running Locally
 To run the Wryly application locally on your R installation, simply run:
