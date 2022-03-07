@@ -21,37 +21,56 @@ library(shinyhelper)
 
 ### CURRENT LANGUAGE SPECIFIER 
 
-CURRENT_LANGUAGE = "TR"
+#CURRENT_LANGUAGE = "TR"
 #CURRENT_LANGUAGE = "EN"
+CURRENT_LANGUAGE = "DE"
 
 ##############################
 
-options(encoding="UTF-8")
+#options(encoding="UTF-8")
 
 is_language_tr = CURRENT_LANGUAGE == "TR"
 is_language_en = CURRENT_LANGUAGE == "EN"
+is_language_de = CURRENT_LANGUAGE == "DE"
 
 words_all <- NULL
 words_common <- NULL
 ls <- NULL
 if(is_language_en){
+  options(encoding="UTF-8")
   Sys.setlocale(category = "LC_ALL", locale = "English")
-  words_all <- read.csv("wordsalpha5.txt", header=F);
-  words_common <- read.csv("wordscommon5.txt", header=F);
+  words_all <- read.csv("word_lists/en/wordsalpha5.txt", header=F);
+  words_common <- read.csv("word_lists/en/wordscommon5.txt", header=F);
   source("language_set_en.R");
   ls <- language_set_en()
   keyboard_default_size <- 1
   keyboard_default_hor_margin <- 2
   keyboard_default_ver_margin <- 4
-} else {
+}
+
+if(is_language_tr){
+  options(encoding="UTF-8")
   Sys.setlocale(category = "LC_ALL", locale = "Turkish")
-  words_all <- read.csv("words_all_tr.txt", header=F);
-  words_common <- read.csv("words_common5_tr.txt", header=F);
+  words_all <- read.csv("word_lists/tr/words_all_tr.txt", header=F);
+  words_common <- read.csv("word_lists/tr/words_common5_tr.txt", header=F);
   source("language_set_tr.R");
   ls <- language_set_tr()
   keyboard_default_size <- 0.9
   keyboard_default_hor_margin <- 1
   keyboard_default_ver_margin <- 3
+}
+
+if(is_language_de){
+  options(encoding="native.enc")
+  Sys.setlocale(category = "LC_ALL", locale = "German")
+  words_all <- read.csv("word_lists/de/words_all_de_special.txt", header=F, encoding = "UTF-8");
+  words_common <- read.csv("word_lists/de/words_all_de_special.txt", header=F, encoding = "UTF-8");
+  source("language_set_de.R");
+  ls <- language_set_de()
+  keyboard_default_size <- 0.9
+  keyboard_default_hor_margin <- 1
+  keyboard_default_ver_margin <- 3
+  message(words_all[25, ])
 }
 
 message(ls$MainTabHowToPlay)
@@ -73,7 +92,6 @@ foList <- function(...){
   }
   return(outList)
 }
-
 
 
 # Define UI for application that draws a histogram
@@ -115,12 +133,26 @@ ui <- fluidPage(
       if (e.which == 8) {$('#buttonBackspace').click() }
       if (e.which == 13) {$('#buttonEnter').click() }
       if (e.which == 27) {$('#buttonClear').click() }
+      
       if (e.which == 219) {$('#buttonGg').click() }
       if (e.which == 221) {$('#buttonUu').click() }
       if (e.which == 186) {$('#buttonSs').click() }
       if (e.which == 222) {$('#buttonIi').click() }
       if (e.which == 191) {$('#buttonOo').click() }
       if (e.which == 220) {$('#buttonCc').click() }
+      
+      // if (e.which == 186) {$('#buttonOo_DE').click() }
+      // if (e.which == 219) {$('#buttonUu_DE').click() }
+      // if (e.which == 189) {$('#buttonBb_DE').click() }
+      // if (e.which == 222) {$('#buttonAa_DE').click() }
+      
+      if (e.which == 192) {$('#buttonOo_DE').click() }
+      if (e.which == 186) {$('#buttonUu_DE').click() }
+      if (e.which == 59) {$('#buttonUu_DE').click() }
+      if (e.which == 63) {$('#buttonBb_DE').click() }
+      if (e.which == 219) {$('#buttonBb_DE').click() }
+      if (e.which == 222) {$('#buttonAa_DE').click() }
+      
       });
       })")),
 
@@ -218,7 +250,7 @@ ui <- fluidPage(
                     style = "padding: 4px; margin-left: 11px; margin-top: 0px; padding-top: 0px;", 
                     actionButton("buttonRestartRandomize", ls$RestartUpdateButtonLabel)
                     #,textInput("text","Write something:"),
-                    #,actionButton("buttonReveal", "Reveal"),
+                    ,actionButton("buttonReveal", "Reveal"),
                     #,tags$a(id = "test_label", "abcd"),
                     ), 
             )
@@ -308,6 +340,15 @@ if(is_language_tr){
                    "Ğ","Ü", "Ş", "İ", "Ö", "Ç")
 }
 
+if(is_language_de){
+  buttonValues = c("A", "B", "C", "D", "E", "F", "G", "H", "I", 
+                   "J", "K", "L", "M", "N", "O", "P", "Q", "R", 
+                   "S", "T", "U", "V", "W", "X", "Y", "Z", 
+                   "Ü", "ß", "Ö", "Ä")
+}
+
+message(buttonValues)
+message(Sys.getlocale())
 
 cs_light <- list(background = "#FCFCFC", selected = "#F5F5CE;", grayclue = "gainsboro", orangeclue = "Orange", greenclue = "lawngreen", noclue = "chocolate", graycluetext = "#6b6b6b")
 cs_dark <- list(background = "#FCFCFC", selected = "#F5F5B2", grayclue = "silver", orangeclue = "Orange", greenclue = "lawngreen", noclue = "chocolate", graycluetext = "#9b9b9b")
@@ -602,6 +643,7 @@ server <- function(input, output, session) {
           out_list$W = 1
           out_list$X = 1
         }
+        
         
         if(current_line() > 1){
         for(j in seq(1, min(current_line(), 6), 1)){
@@ -903,12 +945,20 @@ server <- function(input, output, session) {
     observeEvent(input$buttonX, { fob(24) })
     observeEvent(input$buttonY, { fob(25) })
     observeEvent(input$buttonZ, { fob(26) })
+    
+    ## Turkish Extra Buttons
     observeEvent(input$buttonGg, { fob(27) })
     observeEvent(input$buttonUu, { fob(28) })
     observeEvent(input$buttonSs, { fob(29) })
     observeEvent(input$buttonIi, { fob(30) })
     observeEvent(input$buttonOo, { fob(31) })
     observeEvent(input$buttonCc, { fob(32) })
+    
+    ## German Extra Buttons
+    observeEvent(input$buttonUu_DE, { fob(27) })
+    observeEvent(input$buttonBb_DE, { fob(28) })
+    observeEvent(input$buttonOo_DE, { fob(29) })
+    observeEvent(input$buttonAa_DE, { fob(30) })
     
     current_colorset <- reactive({
       switch(as.numeric(input$night_mode), cs_dark, cs_light)
@@ -920,9 +970,12 @@ server <- function(input, output, session) {
     
     output$test_first_line <- renderUI({
         div_hardcore <- tags$div(style = "height:8px;")
+        
+        margin_left_amount = 160 - 32;
         if(is_language_tr){
           margin_left_amount = 160 - 40;
-        } else {
+        }
+        if(is_language_de){
           margin_left_amount = 160 - 32;
         }
         
@@ -946,7 +999,7 @@ server <- function(input, output, session) {
         )
     })
     
-    
+    foButton <- function(a, b){actionButton(a, b)}
     
     foActionButton <- function(buttonId, buttonTxt){
         colorset <- current_colorset()
@@ -982,7 +1035,6 @@ server <- function(input, output, session) {
         
         min_width_txt = paste("min-width: ", min_width, "px;", sep = "") 
         font_size_txt = paste("font-size: ", font_size, "px;", sep = "") 
-        
         
         margin_hor <- input$keyboard_hor_margin
         margin_ver <- input$keyboard_ver_margin
@@ -1052,7 +1104,7 @@ server <- function(input, output, session) {
     observeEvent(input$hardcore_mode, { foUpdateHardcoreLabel() })
     
     foConditionalButton <- function(buttonId, buttonTxt, condition){
-      out <- tags$div(style = "width:0px; height:0px; margin:0px; padding:0px;")
+      out <- tags$div(style = "display: inline-table; width:0px; height:0px; margin:0px; padding:0px;")
       if(condition){
         out <- foActionButton(buttonId, buttonTxt)
       }
@@ -1069,10 +1121,11 @@ server <- function(input, output, session) {
       #  if(is_tr){ buttonIlabel = "İ"; }
         
        # "ĞÜŞİÖÇ"
+       # "ÜßÖÄ"
         
-        qwerDiv1 <- tags$div(style = "width:0px")
-        qwerDiv2 <- tags$div(style = "width:0px")
-        qwerDiv3 <- tags$div(style = "width:0px")
+        qwerDiv1 <- tags$div(style = "display: inline-table; margin:0px; padding:0px;")
+        qwerDiv2 <- tags$div(style = "display: inline-table; margin:0px; padding:0px;")
+        qwerDiv3 <- tags$div(style = "display: inline-table; margin:0px; padding:0px;")
         if(is_tr){
           qwerDiv1 = tags$div(style = "display: inline-table; margin:0px; padding:0px;", 
                               foActionButton("buttonGg", "Ğ"),foActionButton("buttonUu", "Ü")
@@ -1083,6 +1136,14 @@ server <- function(input, output, session) {
           qwerDiv3 = tags$div(style = "display: inline-table; margin:0px; padding:0px;", 
                               foActionButton("buttonOo", "Ö"),
                               foActionButton("buttonCc", "Ç"))
+        }
+        if(is_language_de){
+          qwerDiv1 = tags$div(style = "display: inline-table; margin:0px; padding:0px;",
+                              foActionButton("buttonUu_DE", "Ü"), foActionButton("buttonBb_DE", "ß")
+          )
+          qwerDiv2 = tags$div(style = "display: inline-table; margin:0px; padding:0px;",
+                              foActionButton("buttonOo_DE", "Ö"),
+                              foActionButton("buttonAa_DE", "Ä"))
         }
         
         if(input$keyboard_style == 1){
@@ -1120,7 +1181,11 @@ server <- function(input, output, session) {
             foActionButton("buttonW", "W"),
             foActionButton("buttonX", "X"),
             foActionButton("buttonY", "Y"),
-            foActionButton("buttonZ", "Z")
+            foActionButton("buttonZ", "Z"),
+            foConditionalButton("buttonUu_DE", "Ü", is_language_de),
+            foConditionalButton("buttonBb_DE", "ß", is_language_de),
+            foConditionalButton("buttonOo_DE", "Ö", is_language_de),
+            foConditionalButton("buttonAa_DE", "Ä", is_language_de),
         )
         } else {
           tags$div(
@@ -1133,7 +1198,8 @@ server <- function(input, output, session) {
               foActionButton("buttonE", "E"),
               foActionButton("buttonR", "R"),
               foActionButton("buttonT", "T"),
-              foActionButton("buttonY", "Y"),
+              foConditionalButton("buttonZ", "Z", is_language_de),
+              foConditionalButton("buttonY", "Y", !is_language_de),
               foActionButton("buttonU", "U"),
               foActionButton("buttonI", buttonIlabel),
               foActionButton("buttonO", "O"),
@@ -1156,7 +1222,8 @@ server <- function(input, output, session) {
             tags$div(
               #style = "margin:0px; padding: 0px;", 
               style = "display: table; margin:0 auto;", 
-              foActionButton("buttonZ", "Z"),
+              foConditionalButton("buttonY", "Y", is_language_de),
+              foConditionalButton("buttonZ", "Z", !is_language_de),
               foActionButton("buttonX", "X"),
               foActionButton("buttonC", "C"),
               foActionButton("buttonV", "V"),
