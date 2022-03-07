@@ -32,6 +32,12 @@ language_set_en <- function(){
   ls$NightModeLabel = "Night mode:"
   ls$NightModeEnabled = "Enabled"
   ls$NightModeDisabled = "Disabled"
+  # ls$ColorblindModeLabel = "Colorblind mode:"
+  # ls$ColorblindModeEnabled = "Enabled"
+  # ls$ColorblindModeDisabled = "Disabled"
+  ls$ColorblindModeLabel = "Color Palette:"
+  ls$ColorblindModeEnabled = "Colorblind friendly"
+  ls$ColorblindModeDisabled = "Default (Orange/Green)"
   
   ls$HowtoplayAim = "There is a hidden 5-letter word, the aim is to find it!"
   ls$HowtoplayGuesses = "A total of 6 guesses are allowed. Each guess has to be a meaningful 5-letter english word."
@@ -40,8 +46,10 @@ language_set_en <- function(){
   ls$GrayColors = "Gray Colors"
   ls$HowtoplayGrayDesc = " indicate that the hidden word doesn't contain the corresponding letter."
   ls$OrangeColors = "Orange Colors"
+  ls$ColorblindOrangeColors = "Yellow Colors"
   ls$HowtoplayOrangeDesc = " indicate that the hidden word contains the corresponding letter, but the positioning of the letter is incorrect."
   ls$GreenColors = "Green Colors"
+  ls$ColorblindGreenColors = "Blue Colors"
   ls$HowtoplayGreenDesc = " indicate that the hidden word contains the corresponding letter, and the positioning of the letter is correct!"
   
   ls$HowtoplayBeforeBrown = "Additionally, "

@@ -51,7 +51,7 @@ if(is_language_en){
 if(is_language_tr){
   options(encoding="UTF-8")
   Sys.setlocale(category = "LC_ALL", locale = "Turkish")
-  words_all <- read.csv("word_lists/tr/words_all_tr.txt", header=F);
+  words_all <- read.csv("word_lists/tr/words_all_tr_v2.txt", header=F);
   words_common <- read.csv("word_lists/tr/words_common5_tr.txt", header=F);
   source("language_set_tr.R");
   ls <- language_set_tr()
@@ -160,6 +160,8 @@ ui <- fluidPage(
     ":root {
     --some-color: black;
     --toast-opacity: 0.8;
+    --orange-clue-color: #ff8c00;
+    --green-clue-color: limegreen;
     }
     
     #toast-container > div {
@@ -250,7 +252,7 @@ ui <- fluidPage(
                     style = "padding: 4px; margin-left: 11px; margin-top: 0px; padding-top: 0px;", 
                     actionButton("buttonRestartRandomize", ls$RestartUpdateButtonLabel)
                     #,textInput("text","Write something:"),
-                    ,actionButton("buttonReveal", "Reveal"),
+                    #,actionButton("buttonReveal", "Reveal"),
                     #,tags$a(id = "test_label", "abcd"),
                     ), 
             )
@@ -270,10 +272,10 @@ ui <- fluidPage(
                         tags$b(ls$GrayColors, style = "color:#858585;", id = "gray_colors_label"), 
                         ls$HowtoplayGrayDesc),
                  tags$p(style="text-align:justify; margin-bottom: 4px;", 
-                        tags$b(ls$OrangeColors, style = "color:#ff8c00;"), 
+                        tags$b(id = "orangecolors_message", ls$OrangeColors, style = "color:var(--orange-clue-color);"), 
                         ls$HowtoplayOrangeDesc), 
                  tags$p(style="text-align:justify; margin-bottom: 4px;", 
-                        tags$b(ls$GreenColors, style = "color:limegreen;"), 
+                        tags$b(id = "greencolors_message", ls$GreenColors, style = "color:var(--green-clue-color);"), 
                         ls$HowtoplayGreenDesc), 
                  tags$p(style="text-align:justify; margin-bottom: 4px;", 
                         ls$HowtoplayBeforeBrown, tags$b(ls$BrownColors, style = "color:chocolate;"), 
@@ -311,7 +313,9 @@ ui <- fluidPage(
                 selectInput("anim_speed", ls$AnimationSpeedLabel, 
                             choices = foList(ls$AnimationSpeedOff, 1, "0.5x", 2, "1x", 3, "2x", 4, "4x", 5), selected = 3, selectize = F),
                 selectInput("night_mode", ls$NightModeLabel, 
-                           choices = foList(ls$NightModeEnabled, 1, ls$NightModeDisabled, 2), selected = 1, selectize = F)
+                           choices = foList(ls$NightModeEnabled, 1, ls$NightModeDisabled, 2), selected = 1, selectize = F),
+                selectInput("colorblind_mode", ls$ColorblindModeLabel, 
+                            choices = foList(ls$ColorblindModeEnabled, 1, ls$ColorblindModeDisabled, 2), selected = 2, selectize = F),
              ),
              tabPanel(ls$OptionsTabKeyboard,
                 selectInput("keyboard_style", ls$KeyboardStyleLabel, 
@@ -350,8 +354,11 @@ if(is_language_de){
 message(buttonValues)
 message(Sys.getlocale())
 
-cs_light <- list(background = "#FCFCFC", selected = "#F5F5CE;", grayclue = "gainsboro", orangeclue = "Orange", greenclue = "lawngreen", noclue = "chocolate", graycluetext = "#6b6b6b")
-cs_dark <- list(background = "#FCFCFC", selected = "#F5F5B2", grayclue = "silver", orangeclue = "Orange", greenclue = "lawngreen", noclue = "chocolate", graycluetext = "#9b9b9b")
+cs_light <- list(background = "#FCFCFC", selected = "#F5F5CE;", grayclue = "gainsboro", graycluetext = "#6b6b6b")
+cs_dark <- list(background = "#FCFCFC", selected = "#F5F5B2", grayclue = "silver", graycluetext = "#9b9b9b")
+
+cs_normal <- list(orangeclue = "Orange", greenclue = "lawngreen", noclue = "chocolate", orangecluetext = "#ff8c00", greencluetext = "limegreen", orangeclue_message = ls$OrangeColors, greenclue_message = ls$GreenColors)
+cs_colorblind <- list(orangeclue = "#FFC20A", greenclue = "#1A85FF", noclue = "chocolate", orangecluetext = "#FFC20A", greencluetext = "#1A85FF", orangeclue_message = ls$ColorblindOrangeColors, greenclue_message = ls$ColorblindGreenColors)
 
 fox <- function(txt, qwer = T, animTime = 0, colorset = cs_light) {
     bgcolor <- paste("background-color:", colorset$background, ";", sep = "");
@@ -417,6 +424,13 @@ server <- function(input, output, session) {
   current_word_list <- reactive({
     switch(as.numeric(input$word_difficulty), words_common, words_all)
   })
+  
+  foToLower <- function(txt){
+    if(is_language_tr){
+      return(tolower(gsub("I", "ı", gsub("İ", "i", txt))))
+    }
+    tolower(txt)
+  }
   
   foToUpper <- function(txt){
     if(is_language_tr){
@@ -669,13 +683,6 @@ server <- function(input, output, session) {
         out_list
     })
     
-    foToLower <- function(txt){
-      if(is_language_en){
-        return(tolower(txt))
-      }
-      tolower(gsub("I", "ı", gsub("İ", "i", txt)))
-    }
-    
     foCheckDictionary <- function(){
        # message(foToLower(paste(current_line_txt(), collapse='')))
         is.element(foToLower(paste(current_line_txt(), collapse='')), words_all[,])
@@ -744,6 +751,16 @@ server <- function(input, output, session) {
         }
         return(count == 5)
     }
+    
+    observeEvent(input$colorblind_mode, {
+      cs_clue <- current_clue_colorset()
+      runjs(sprintf("document.documentElement.style.setProperty('--orange-clue-color', '%s');", cs_clue$orangecluetext))
+      runjs(sprintf("document.documentElement.style.setProperty('--green-clue-color', '%s');", cs_clue$greencluetext))
+      #runjs(sprintf("document.documentElement.style.setProperty('--orange-clue-message', '%s');", cs_clue$orangeclue_message))
+      #runjs(sprintf("document.documentElement.style.setProperty('--green-clue-message', '%s');", cs_clue$greenclue_message))
+      runjs(paste("document.getElementById('orangecolors_message').innerHTML = '", cs_clue$orangeclue_message, "';", sep = ""))
+      runjs(paste("document.getElementById('greencolors_message').innerHTML = '", cs_clue$greenclue_message, "';", sep = ""))
+    })
     
     
     observeEvent(input$night_mode, {
@@ -960,8 +977,14 @@ server <- function(input, output, session) {
     observeEvent(input$buttonOo_DE, { fob(29) })
     observeEvent(input$buttonAa_DE, { fob(30) })
     
+    current_clue_colorset <- reactive({
+      switch(as.numeric(input$colorblind_mode), cs_colorblind, cs_normal)
+    })
+    
     current_colorset <- reactive({
-      switch(as.numeric(input$night_mode), cs_dark, cs_light)
+      cs_main <- switch(as.numeric(input$night_mode), cs_dark, cs_light)
+      cs_clue <- current_clue_colorset()
+      return(c(cs_main, cs_clue))
     })
     
     current_keyboardsize <- reactive({
@@ -1182,10 +1205,10 @@ server <- function(input, output, session) {
             foActionButton("buttonX", "X"),
             foActionButton("buttonY", "Y"),
             foActionButton("buttonZ", "Z"),
+            foConditionalButton("buttonAa_DE", "Ä", is_language_de),
+            foConditionalButton("buttonOo_DE", "Ö", is_language_de),
             foConditionalButton("buttonUu_DE", "Ü", is_language_de),
             foConditionalButton("buttonBb_DE", "ß", is_language_de),
-            foConditionalButton("buttonOo_DE", "Ö", is_language_de),
-            foConditionalButton("buttonAa_DE", "Ä", is_language_de),
         )
         } else {
           tags$div(

@@ -32,6 +32,12 @@ language_set_tr <- function(){
   ls$NightModeLabel = "Gece modu:"
   ls$NightModeEnabled = "Aktif"
   ls$NightModeDisabled = "Deaktif"
+  #ls$ColorblindModeLabel = "Renk körü modu:"
+  #ls$ColorblindModeEnabled = "Aktif"
+  #ls$ColorblindModeDisabled = "Deaktif"
+  ls$ColorblindModeLabel = "Renk paleti:"
+  ls$ColorblindModeEnabled = "Renk körü dostu"
+  ls$ColorblindModeDisabled = "Orijinal (Turuncu/Yeşil)"
   
   ls$HowtoplayAim = "Gizli 5 harfli bir kelime var, amacımız tahminler yaparak o kelimeyi bulmak!"
   ls$HowtoplayGuesses = "Toplam 6 tahmin hakkı var ve her tahmin 5 harfli anlamlı bir Türkçe kelime olmak zorunda."
@@ -40,8 +46,10 @@ language_set_tr <- function(){
   ls$GrayColors = "Gri Renkler"
   ls$HowtoplayGrayDesc = " gizli kelimenin o harfi içermediğini, "
   ls$OrangeColors = "Turuncu Renkler"
+  ls$ColorblindOrangeColors = "Sarı Renkler"
   ls$HowtoplayOrangeDesc = " gizli kelimenin o harfi içerdiğini ama konumunun yanlış olduğunu, "
   ls$GreenColors = "Yeşil Renkler"
+  ls$ColorblindGreenColors = "Mavi Renkler"
   ls$HowtoplayGreenDesc = "  ise hem gizli kelimenin o harfi içerdiğini, hem de harfin konumunun doğru olduğunu gösteriyor!"
   
   ls$HowtoplayBeforeBrown = "Ek olarak, çetinceviz modundaki "
