@@ -61,12 +61,17 @@ if(is_language_tr){
 }
 
 if(is_language_de){
+  #options(encoding="UTF-8")
   options(encoding="native.enc")
-  Sys.setlocale(category = "LC_ALL", locale = "German")
+  Sys.setlocale(category = "LC_ALL", locale = "Turkish")
+  #Sys.setlocale(category = "LC_ALL", locale = "German")
   words_all <- read.csv("word_lists/de/words_all_de_special.txt", header=F, encoding = "UTF-8");
-  words_common <- read.csv("word_lists/de/words_all_de_special.txt", header=F, encoding = "UTF-8");
-  source("language_set_de.R");
+  words_common <- read.csv("word_lists/de/words_all_de_commons.txt", header=F, encoding = "UTF-8");
+  source("language_set_de.R", local = TRUE, encoding = "UTF-8");
+  #message("Spielßüöä")
+  
   ls <- language_set_de()
+  #ls$MainTabGame <- "SpielßüöäXX"
   keyboard_default_size <- 0.9
   keyboard_default_hor_margin <- 1
   keyboard_default_ver_margin <- 3
@@ -101,6 +106,14 @@ ui <- fluidPage(
     shinybrowser::detect(),
     theme = shinytheme("cerulean"),
     tags$style(type='text/css', ".container-fluid { padding: 14px; padding-right: 15px; min-height: 0;}"),
+    
+    tags$head(
+      tags$link(rel="shortcut icon", href="favicon.png"),
+      #tags$meta(name="description", content="RokaiXplorer"),
+      #tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
+      #includeHTML(("www/google-analytics.html")),
+      #tags$script(on_ready)
+    ),
     
     tags$script(HTML("$(function(){ 
       $(document).keyup(function(e) {
@@ -232,6 +245,7 @@ ui <- fluidPage(
 
     tabsetPanel(
         id = "main_tabset_panel", 
+        #tabPanel("Spielßüöä", 
         tabPanel(ls$MainTabGame,
                  #style = "padding-left: 4px;", 
     
