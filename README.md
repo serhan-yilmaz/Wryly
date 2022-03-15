@@ -14,6 +14,10 @@ For more information and Turkish descriptions, please visit: http://wordleturkce
 
 <img src="images/wryly_tr_img_3.png" width="164"> <img src="images/wryly_tr_img_1.png" width="150"> <img src="images/wryly_tr_img_2.png" width="226"> 
 
+# German Version
+Wryly is now also available in Deutsch! To access the Deutsch version, please visit: [Wryly DE](https://yilmazs.shinyapps.io/wryly_de).
+
+
 ## Running Locally
 To run the Wryly application locally on your R installation, simply run:
 ```
