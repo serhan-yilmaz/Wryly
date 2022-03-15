@@ -4,7 +4,7 @@ Sys.setlocale(category = "LC_ALL", locale = "English")
 
 language_set_en <- function(){
   ls <- list()
-  ls$TitleText = "Wordplay, but Wryly!"
+  ls$TitleText = "Wordle, but Wryly!"
   ls$TitleBrowser = "Wryly"
   ls$MainTabGame =  "Game"
   ls$MainTabHowToPlay = "How to Play?"
@@ -22,7 +22,7 @@ language_set_en <- function(){
   ls$HardcoreModeTooltip = "In hardcore mode, entering a word that is not in the dictionary still counts as a guess, but provides no clues."
   ls$HardcoreModeIndicatorLabel = "Hardcore Mode!"
   ls$KeyboardStyleLabel = "Keyboard Style:"
-  ls$KeyboardStyleQwerty = "Qwerty (experimental)"
+  ls$KeyboardStyleQwerty = "Qwerty"
   ls$KeyboardStyleAbcd = "Abcd"
   ls$KeyboardSizeLabel = "Keyboard Size:"
   ls$KeyboardHorizontalMargin = "Horizontal Margin:"

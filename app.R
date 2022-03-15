@@ -22,8 +22,8 @@ library(shinyhelper)
 ### CURRENT LANGUAGE SPECIFIER 
 
 #CURRENT_LANGUAGE = "TR"
-#CURRENT_LANGUAGE = "EN"
-CURRENT_LANGUAGE = "DE"
+CURRENT_LANGUAGE = "EN"
+#CURRENT_LANGUAGE = "DE"
 
 ##############################
 
