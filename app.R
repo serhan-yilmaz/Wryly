@@ -22,8 +22,9 @@ library(shinyhelper)
 ### CURRENT LANGUAGE SPECIFIER 
 
 #CURRENT_LANGUAGE = "TR"
-CURRENT_LANGUAGE = "EN"
+#CURRENT_LANGUAGE = "EN"
 #CURRENT_LANGUAGE = "DE"
+CURRENT_LANGUAGE = "POR"
 
 ##############################
 
@@ -32,6 +33,7 @@ CURRENT_LANGUAGE = "EN"
 is_language_tr = CURRENT_LANGUAGE == "TR"
 is_language_en = CURRENT_LANGUAGE == "EN"
 is_language_de = CURRENT_LANGUAGE == "DE"
+is_language_por = CURRENT_LANGUAGE == "POR"
 
 words_all <- NULL
 words_common <- NULL
@@ -76,6 +78,18 @@ if(is_language_de){
   keyboard_default_hor_margin <- 1
   keyboard_default_ver_margin <- 3
   message(words_all[25, ])
+}
+
+if(is_language_por){
+  options(encoding="UTF-8")
+  Sys.setlocale(category = "LC_ALL", locale = "English")
+  words_all <- read.csv("word_lists/por/words_all_por_combined.txt", header=F);
+  words_common <- read.csv("word_lists/por/words_common_por.txt", header=F);
+  source("language_set_por.R");
+  ls <- language_set_por()
+  keyboard_default_size <- 1
+  keyboard_default_hor_margin <- 2
+  keyboard_default_ver_margin <- 4
 }
 
 message(ls$MainTabHowToPlay)
