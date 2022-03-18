@@ -17,6 +17,8 @@ For more information and Turkish descriptions, please visit: http://wordleturkce
 # German Version
 Wryly is now also available in Deutsch! To access the Deutsch version, please visit: [Wryly DE](https://yilmazs.shinyapps.io/wryly_de).
 
+# Portuguese Version (European)
+Wryly is now also available in Portuguese! To access it, please visit: [Wryly POR](https://yilmazs.shinyapps.io/wryly_de).
 
 ## Running Locally
 To run the Wryly application locally on your R installation, simply run:
